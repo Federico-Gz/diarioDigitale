@@ -1,5 +1,6 @@
 package it.academy.corso.diarioDigitale.model;
 
+import it.academy.corso.diarioDigitale.materia.model.Materia;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
