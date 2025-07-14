@@ -1,5 +1,7 @@
-package it.academy.corso.diarioDigitale.model;
+package it.academy.corso.diarioDigitale.voto.model;
 
+import it.academy.corso.diarioDigitale.model.Materia;
+import it.academy.corso.diarioDigitale.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,24 +19,26 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Table(name = "Messaggio")
-public class Messaggio {
 
+@Table (name = "voto")
+public class Voto{
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, length = 150)
-    private String contenuto;
+    @GeneratedValue( strategy = GenerationType.IDENTITY)    
+    private int id;
+    
+    @Column(nullable = false)
+    private double valore;
 
     @ManyToOne
     @JoinColumn(name = "id_studente", nullable = false)
     private User studente;
 
     @ManyToOne
-    @JoinColumn(name = "id_docente", nullable = false)
-    private User docente;
+    @JoinColumn(name = "id_materia", nullable = false)
+    private Materia materia;
+    
 }
