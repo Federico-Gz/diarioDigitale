@@ -22,8 +22,8 @@ import lombok.Setter;
 public class Materia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
-    @Column(nullable = false)
+    private String uuid;
     private String nome;
 }
