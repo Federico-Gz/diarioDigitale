@@ -1,5 +1,6 @@
-package it.academy.corso.diarioDigitale.model;
+package it.academy.corso.diarioDigitale.comunicazione.model;
 
+import it.academy.corso.diarioDigitale.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

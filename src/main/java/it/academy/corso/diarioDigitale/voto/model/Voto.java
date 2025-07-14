@@ -1,7 +1,8 @@
 package it.academy.corso.diarioDigitale.voto.model;
 
-import it.academy.corso.diarioDigitale.model.Materia;
-import it.academy.corso.diarioDigitale.model.User;
+
+import it.academy.corso.diarioDigitale.materia.model.Materia;
+import it.academy.corso.diarioDigitale.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,7 +29,9 @@ public class Voto{
     
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY)    
-    private int id;
+    private long id;
+
+    private String uuid;
     
     @Column(nullable = false)
     private double valore;
