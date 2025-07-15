@@ -11,6 +11,6 @@ import it.academy.corso.diarioDigitale.voto.model.Voto;
 @Repository
 public interface VotoRepository extends JpaRepository<Voto, Long>{
 
-    List<Voto> findByStudente(User studente);
+    List<Voto> findByStudenteId(Long studenteId);
 
 }

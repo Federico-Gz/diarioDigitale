@@ -17,8 +17,8 @@ public class VotoDTO {
     @NotNull
     private double valore;
 
-    private Long idStudente;
+    private Long studenteId;
 
-    private Long idMateria;
+    private Long materiaId;
 
 }
