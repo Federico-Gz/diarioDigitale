@@ -29,7 +29,9 @@ public class Voto{
     
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY)    
-    private int id;
+    private long id;
+
+    private String uuid;
     
     @Column(nullable = false)
     private double valore;
