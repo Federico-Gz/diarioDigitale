@@ -2,7 +2,7 @@ package it.academy.corso.diarioDigitale.compito.model;
 
 import java.sql.Date;
 
-import it.academy.corso.diarioDigitale.model.Materia;
+import it.academy.corso.diarioDigitale.materia.model.Materia;
 import it.academy.corso.diarioDigitale.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
