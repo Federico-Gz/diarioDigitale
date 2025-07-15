@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import it.academy.corso.diarioDigitale.materia.model.Materia;
+import it.academy.corso.diarioDigitale.user.model.User;
 import it.academy.corso.diarioDigitale.voto.DTO.VotoDTO;
 import it.academy.corso.diarioDigitale.voto.model.Voto;
 import it.academy.corso.diarioDigitale.voto.repository.VotoRepository;
@@ -19,22 +21,39 @@ public class VotoServiceImpl implements VotoService {
 
 
     @Override
-    public VotoDTO salvaVoto(VotoDTO votoDTO, Long idStudente, Long idMateria) {
+    public VotoDTO salvaVoto(VotoDTO votoDTO, User idStudente, Materia idMateria) {
         votoDTO.setUuid(UUID.randomUUID().toString());
+        votoDTO.setStudenteId(idStudente);
+        votoDTO.setMateriaId(idMateria);
         Voto voto = dtoToModel(votoDTO);
         Voto saved = votoRepository.save(voto);
-    return modelToDto(saved);
-}
+        return modelToDto(saved);
+    }
 
 
     @Override
-    public List<VotoDTO> getVotiByStudente(Long idStudente) {
-       return votoRepository.findById(idStudente)
+    public List<VotoDTO> getVotiByStudente(User idStudente) {
+       return votoRepository.findByStudente(idStudente)
             .stream()
             .map(this::modelToDto)
             .toList();
     }
 
+     @Override
+    public List<VotoDTO> getVotiByMateria(Materia idMateria) {
+       return votoRepository.findByMateria(idMateria)
+            .stream()
+            .map(this::modelToDto)
+            .toList();
+    }
+
+    @Override
+    public List<VotoDTO> getAllVoti() {
+       return votoRepository.findAll()
+            .stream()
+            .map(this::modelToDto)
+            .toList();
+    }
 
     // conversioni
 
@@ -42,7 +61,7 @@ public class VotoServiceImpl implements VotoService {
         return VotoDTO.builder()
             .uuid(voto.getUuid())
             .valore(voto.getValore())
-            .studenteId(voto.getStudente())
+            .studenteId(voto.getStudente().getUuid())
             .materiaId(voto.getMateria())
             .build();
         }
@@ -51,8 +70,8 @@ public class VotoServiceImpl implements VotoService {
         return Voto.builder()
         .uuid(votoDTO.getUuid())
         .valore(votoDTO.getValore())
-        .studente(votoDTO.getStudenteId())
-        .materia(votoDTO.getMateriaId())
+        .studente(votoDTO.getStudenteId().getUuid())
+        .materia(votoDTO.getMateriaId().getUuid())
         .build();
     }
 

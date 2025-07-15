@@ -1,5 +1,7 @@
 package it.academy.corso.diarioDigitale.voto.DTO;
 
+import it.academy.corso.diarioDigitale.materia.model.Materia;
+import it.academy.corso.diarioDigitale.user.model.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,8 +19,8 @@ public class VotoDTO {
     @NotNull
     private double valore;
 
-    private Long studenteId;
+    private User studenteId;
 
-    private Long materiaId;
+    private Materia materiaId;
 
 }
