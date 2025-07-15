@@ -21,13 +21,16 @@ public class VotoController {
     
     private final VotoService votoService;
 
-    @PostMapping
+
+    //aggiungere un voto 
+    @PostMapping("/{idStudente}/{idMateria}")
     public VotoDTO salvaVoto(@RequestBody VotoDTO votoDTO, @PathVariable Long idStudente, @PathVariable Long idMateria){
 
         return votoService.salvaVoto(votoDTO, idStudente, idMateria);
     }
 
-    @GetMapping
+    //vedere lisat voti per studente
+    @GetMapping("/{idStudente}")
 
     public List<VotoDTO> getVotiStudente(@PathVariable Long idStuente){
         return votoService.getVotiByStudente(idStuente);
