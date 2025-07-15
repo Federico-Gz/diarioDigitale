@@ -43,5 +43,4 @@ public class Voto{
     @ManyToOne
     @JoinColumn(name = "id_materia", nullable = false)
     private Materia materia;
-    
 }
