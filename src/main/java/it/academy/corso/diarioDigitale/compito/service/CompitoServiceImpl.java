@@ -1,7 +1,6 @@
 package it.academy.corso.diarioDigitale.compito.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -11,7 +10,6 @@ import it.academy.corso.diarioDigitale.compito.model.Compito;
 import it.academy.corso.diarioDigitale.compito.repository.CompitoRepository;
 import it.academy.corso.diarioDigitale.materia.model.Materia;
 import it.academy.corso.diarioDigitale.materia.repository.MateriaRepository;
-import it.academy.corso.diarioDigitale.user.dto.UserDTO;
 import it.academy.corso.diarioDigitale.user.model.User;
 import it.academy.corso.diarioDigitale.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,19 +27,25 @@ public class CompitoServiceImpl implements CompitoService {
 
     @Override
     public CompitoDTO createCompito(CompitoDTO compitoDTO) {
-        // Carica il docente
+        //Carica il docente
         User docente = userRepository.findByUuid(compitoDTO.getDocenteUuid())
             .orElseThrow(() -> new EntityNotFoundException("Docente non trovato"));
         if (!docente.getRuolo().equalsIgnoreCase("DOCENTE")) {
             throw new IllegalArgumentException("Solo i docenti possono creare compiti");
         }
 
-        // Carica la materia
+        //Carica la materia
         Materia materia = materiaRepository.findByUuid(compitoDTO.getMateriaUuid())
             .orElseThrow(() -> new EntityNotFoundException("Materia non trovata"));
 
+
+        User studente = userRepository.findByUuid(compitoDTO.getStudenteUuid()).orElseThrow(() -> new EntityNotFoundException("Studente non trovato"));
+        
         compitoDTO.setUuid(UUID.randomUUID().toString());
-        return modelToDTO(compitoRepository.save(dtoToModel(compitoDTO)));
+
+        Compito compito = dtoToModel(compitoDTO, docente, materia, studente);
+
+        return modelToDTO(compitoRepository.save((compito)));
     }
 
     @Override
@@ -84,12 +88,12 @@ public class CompitoServiceImpl implements CompitoService {
         }
         compitoRepository.delete(compito);
     }
-
+/* 
     private Compito dtoToModel(CompitoDTO dto) {
-        User docente = userRepository.findByUuid(dto.getDocente().getUuid())
+        User docente = userRepository.findByUuid(dto.getDocenteUuid())
                 .orElseThrow(() -> new RuntimeException("Docente non trovato"));
 
-        Materia materia = materiaRepository.findByUuid(dto.getMateria().getUuid)
+        Materia materia = materiaRepository.findByUuid(dto.getMateriaUuid())
                 .orElseThrow(() -> new RuntimeException("Materia non trovata"));
 
         return Compito.builder()
@@ -99,6 +103,18 @@ public class CompitoServiceImpl implements CompitoService {
                 .docente(docente)
                 .materia(materia)
                 .build();
+    }
+*/
+
+    private Compito dtoToModel(CompitoDTO dto, User docente, Materia materia, User studente) {
+        return Compito.builder()
+            .uuid(dto.getUuid())
+            .descrizione(dto.getDescrizione())
+            .scadenza(dto.getScadenza())
+            .docente(docente)
+            .materia(materia)
+            .studente(studente)
+            .build();
     }
 
     private CompitoDTO modelToDTO(Compito model) {

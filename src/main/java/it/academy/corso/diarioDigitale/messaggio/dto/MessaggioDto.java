@@ -1,6 +1,5 @@
 package it.academy.corso.diarioDigitale.messaggio.dto;
 
-import it.academy.corso.diarioDigitale.user.model.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,14 +13,16 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MessaggioDto {
+public class MessaggioDTO {
+
+    private String uuid;
 
     @NotBlank //non puo essere vuoto
     private String contenuto;
     @NotNull
-    private User idStudente;
+    private String studenteUuid;
     @NotNull
-    private User idDocente;
+    private String docenteUuid;
 
     private String nomeStudente;
     private String nomeDocente;

@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.academy.corso.diarioDigitale.messaggio.dto.MessaggioDto;
+import it.academy.corso.diarioDigitale.messaggio.dto.MessaggioDTO;
 import it.academy.corso.diarioDigitale.messaggio.service.MessaggioService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/messaggi")
+@RequestMapping("/api/v1/messaggi")
 @RequiredArgsConstructor
 
 public class MessaggioController {
@@ -23,19 +23,20 @@ public class MessaggioController {
 
     //crea un messaggio
     @PostMapping
-    public MessaggioDto creaMessaggio(@RequestBody MessaggioDto messaggioDto){
-        return messaggioService.creaMessaggio(messaggioDto);
+    public MessaggioDTO creaMessaggio(@RequestBody MessaggioDTO messaggioDto){
+        
+        return messaggioService.save(messaggioDto);
     }
 
-    //visualizza messaggi
-    @GetMapping
-    public List<MessaggioDto> getAllMessaggi(){
-        return messaggioService.getAllMessaggi();
+    //visualizza messaggi studente
+    @GetMapping("/studente/{uuid}")
+    public List<MessaggioDTO> getAllMessaggiStudente(@PathVariable String uuid){
+        return messaggioService.findAllByStudenteUuid(uuid);
     }
 
-    //visualizza dettaglio messaggio
-    @GetMapping("/{idMessaggio}")
-    public MessaggioDto getMessaggioById(@PathVariable("id_messaggio") Long idMessaggio){
-        return messaggioService.getMessaggioById(idMessaggio);
+    //visualizza messaggi docente
+    @GetMapping("/docente/{uuid}")
+    public List<MessaggioDTO> getMessaggioById(@PathVariable String uuid){
+        return messaggioService.findAllByDocenteUuid(uuid);
     }
  }

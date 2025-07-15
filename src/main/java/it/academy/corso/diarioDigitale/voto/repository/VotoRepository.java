@@ -1,19 +1,20 @@
 package it.academy.corso.diarioDigitale.voto.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import it.academy.corso.diarioDigitale.materia.model.Materia;
-import it.academy.corso.diarioDigitale.user.model.User;
 import it.academy.corso.diarioDigitale.voto.model.Voto;
 
 @Repository
 public interface VotoRepository extends JpaRepository<Voto, Long>{
 
-    List<Voto> findByStudente(User idStudente);
+    Optional<Voto> findByUuid(String uuid);
     
-    List<Voto> findByMateria(Materia idMateria);
+    List<Voto> findByStudenteUuid(String uuid);
+    
+    List<Voto> findByMateriaUuid(String uuid);
 
+    List<Voto> findByDocenteUuid(String uuid);
 }

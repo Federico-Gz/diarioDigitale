@@ -24,9 +24,12 @@ import lombok.Setter;
 @Table(name = "Messaggio")
 public class Messaggio {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String uuid;
 
     @Column(nullable = false, length = 150)
     private String contenuto;

@@ -41,6 +41,10 @@ public class Voto{
     private User studente;
 
     @ManyToOne
+    @JoinColumn(name = "id_docente", nullable = false)
+    private User docente;
+
+    @ManyToOne
     @JoinColumn(name = "id_materia", nullable = false)
     private Materia materia;
 }

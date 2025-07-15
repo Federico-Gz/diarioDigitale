@@ -32,4 +32,8 @@ public class CompitoDTO {
     @NotNull
     @NotEmpty
     private String docenteUuid;
+
+    @NotNull
+    @NotEmpty
+    private String studenteUuid;
 }

@@ -1,7 +1,6 @@
 package it.academy.corso.diarioDigitale.comunicazione.controller;
 
 import it.academy.corso.diarioDigitale.comunicazione.DTO.ComunicazioneDTO;
-import it.academy.corso.diarioDigitale.comunicazione.model.Comunicazione;
 import it.academy.corso.diarioDigitale.comunicazione.service.ComunicazioneService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -8,16 +8,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import it.academy.corso.diarioDigitale.materia.model.Materia;
-import it.academy.corso.diarioDigitale.user.model.User;
 import it.academy.corso.diarioDigitale.voto.DTO.VotoDTO;
 import it.academy.corso.diarioDigitale.voto.service.VotoService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1")
+@RequestMapping("api/v1/voti")
 
 public class VotoController {
     
@@ -28,34 +25,26 @@ public class VotoController {
 
     @PostMapping("/voti")
     public VotoDTO salvaVoto(@RequestBody VotoDTO votoDTO){
-        return votoService.salvaVoto(votoDTO, votoDTO.getStudenteId(), votoDTO.getMateriaId());
+        return votoService.salvaVoto(votoDTO);
     }
 
-    //vedere tutti i voti (DOCENTE)
-
-    @GetMapping("/professori/voti")
-    public List <VotoDTO> getAllVoti(){
-        return votoService.getAllVoti();
-    }
-
-    //vedere tutti i voti dello studente
-
-    @GetMapping("/studenti/voti")
-    public List<VotoDTO> getAllVotiStudente(){
-        return votoService.getAllVoti();
-    }
 
     //vedere tutti i voti di uno studente 
-    @GetMapping("/professori/voti/{idStudente}")
-    public List<VotoDTO> getVotiStudente(@PathVariable User idStudente){
-        return votoService.getVotiByStudente(idStudente);
+    @GetMapping("/studente/{idStudente}")
+    public List<VotoDTO> getVotiStudente(@PathVariable String uuidStudente){
+        return votoService.findByStudenteUuid(uuidStudente);
     }
 
+    //vedere tutti i voti asseganti (docente)
+    @GetMapping("/docente/{idDocente}")
+    public List<VotoDTO> getVotiDocente(@PathVariable String uuidDocente){
+        return votoService.findByDocenteUuid(uuidDocente);
+    }
     //vedere tutti i voti di una materia specifica (STUDENTE)
-    @GetMapping("/studenti/voti/{idMateria}")
+   /*  @GetMapping("/studenti/voti/{idMateria}")
     public List<VotoDTO> getVotiMateria(@PathVariable Materia idMateria){
         return votoService.getVotiByMateria(idMateria);
-    }
+    }*/
 
     
 }

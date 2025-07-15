@@ -45,5 +45,9 @@ public class Compito {
     @JoinColumn(name = "id_docente", nullable = false)
     private User docente;
 
+    @ManyToOne
+    @JoinColumn(name = "id_studente", nullable = false)
+    private User studente;
+
 
 }
