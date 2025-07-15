@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,18 +25,21 @@ public class MateriaServiceImpl implements MateriaService{
     }
 
     @Override
-    public MateriaDTO findByUuid(String Uuid) {
-        return null;
+    public MateriaDTO findByUuid(String uuid) {
+        MateriaDTO ret = modelToDto(materiaRepository.findByUuid(uuid).orElseThrow());
+        return ret;
     }
 
     @Override
     public MateriaDTO save(MateriaDTO materia) {
-        return null;
+        materia.setNome(UUID.randomUUID().toString());
+        return modelToDto(materiaRepository.save(dtoToModel(materia)));
     }
 
     @Override
-    public void deleteByUuid(String Uuid) {
-
+    public void deleteByUuid(String uuid) {
+        Materia materiaToDelete = materiaRepository.findByUuid(uuid).orElseThrow();
+        materiaRepository.deleteById(materiaToDelete.getId());
     }
 
     private MateriaDTO modelToDto(Materia materia){
