@@ -29,7 +29,9 @@ public class Voto{
     
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY)    
-    private int id;
+    private long id;
+
+    private String uuid;
     
     @Column(nullable = false)
     private double valore;
@@ -37,6 +39,10 @@ public class Voto{
     @ManyToOne
     @JoinColumn(name = "id_studente", nullable = false)
     private User studente;
+
+    @ManyToOne
+    @JoinColumn(name = "id_docente", nullable = false)
+    private User docente;
 
     @ManyToOne
     @JoinColumn(name = "id_materia", nullable = false)

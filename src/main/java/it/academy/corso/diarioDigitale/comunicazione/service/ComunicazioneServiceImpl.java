@@ -3,6 +3,9 @@ package it.academy.corso.diarioDigitale.comunicazione.service;
 import it.academy.corso.diarioDigitale.comunicazione.DTO.ComunicazioneDTO;
 import it.academy.corso.diarioDigitale.comunicazione.model.Comunicazione;
 import it.academy.corso.diarioDigitale.comunicazione.repository.ComunicazioneRepository;
+import it.academy.corso.diarioDigitale.user.model.User;
+import it.academy.corso.diarioDigitale.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import java.util.UUID;
 public class ComunicazioneServiceImpl implements ComunicazioneService{
 
     private final ComunicazioneRepository comunicazioneRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<ComunicazioneDTO> findAll() {
@@ -32,16 +36,35 @@ public class ComunicazioneServiceImpl implements ComunicazioneService{
     }
 
     @Override
-    public ComunicazioneDTO save(ComunicazioneDTO comunicazione) {
-        comunicazione.setUuid(UUID.randomUUID().toString());
-        return modelToDto( comunicazioneRepository.save(dtoToModel(comunicazione)));
+    public ComunicazioneDTO save(ComunicazioneDTO comunicazioneDto) {
+
+        User studente = userRepository.findByUuid(comunicazioneDto.getStudenteUuid()).orElseThrow(() -> new EntityNotFoundException("Studente non trovato"));
+        User docente = userRepository.findByUuid(comunicazioneDto.getDocenteUuid()).orElseThrow(() -> new EntityNotFoundException("Docente non trovato"));
+
+        
+        comunicazioneDto.setUuid(UUID.randomUUID().toString());
+        Comunicazione comunicazione = dtoToModel(comunicazioneDto, studente, docente);
+
+        return modelToDto(comunicazioneRepository.save(comunicazione));
     }
 
     @Override
     public void deleteByUuid(String uuid) {
         Comunicazione comunicazioneToDelete = comunicazioneRepository.findByUuid(uuid).orElseThrow();
-        comunicazioneRepository.deleteById(comunicazioneToDelete.getId());
+        comunicazioneRepository.deleteByUuid(comunicazioneToDelete.getUuid());
     }
+
+    public void inviaAGliStudenti(User docente, String testo) {
+    List<User> studenti = userRepository.findByRuolo("STUDENTE");
+    for (User studente : studenti) {
+        Comunicazione c = new Comunicazione();
+        c.setTesto(testo);
+        c.setStudente(studente);
+        c.setDocente(docente); // chi è il mittente
+        comunicazioneRepository.save(c);
+    }
+}
+
 
    private ComunicazioneDTO modelToDto(Comunicazione comunicazione){
         return ComunicazioneDTO.builder()
@@ -50,10 +73,12 @@ public class ComunicazioneServiceImpl implements ComunicazioneService{
                 .build();
    }
 
-   private Comunicazione dtoToModel(ComunicazioneDTO comunicazione){
+   private Comunicazione dtoToModel(ComunicazioneDTO comunicazione, User studente, User docente){
         return Comunicazione.builder()
                 .uuid(comunicazione.getUuid())
                 .testo(comunicazione.getTesto())
+                .docente(docente)
+                .studente(studente)
                 .build();
    }
 }

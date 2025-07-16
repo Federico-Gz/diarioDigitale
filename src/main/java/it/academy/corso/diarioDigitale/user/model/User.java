@@ -18,12 +18,14 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="User")
+@Table(name="Users")
 
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
+
+    private String uuid;
 
     @Column(nullable = false)
     private String nome;
@@ -31,7 +33,7 @@ public class User {
     @Column(nullable = false)
     private String cognome;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String username;
 
     @Column(nullable = false)

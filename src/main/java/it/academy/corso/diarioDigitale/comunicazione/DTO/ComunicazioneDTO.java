@@ -16,6 +16,6 @@ public class ComunicazioneDTO {
     @NotNull
     @NotEmpty
     private String testo;
-    private String id_studente;
-    private String id_docente;
+    private String studenteUuid;
+    private String docenteUuid;
 }
