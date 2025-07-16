@@ -12,4 +12,5 @@ public interface UserService {
     List<UserDTO> getAllUsers();
     void deleteUser(String uuid);
     UserDTO login(String username, String password);
+    List<UserDTO> getUserByRuoloStudente(String ruolo);
 } 

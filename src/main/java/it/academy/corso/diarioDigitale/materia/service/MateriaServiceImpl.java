@@ -32,14 +32,14 @@ public class MateriaServiceImpl implements MateriaService{
 
     @Override
     public MateriaDTO save(MateriaDTO materia) {
-        materia.setNome(UUID.randomUUID().toString());
+        materia.setUuid(UUID.randomUUID().toString());
         return modelToDto(materiaRepository.save(dtoToModel(materia)));
     }
 
     @Override
     public void deleteByUuid(String uuid) {
         Materia materiaToDelete = materiaRepository.findByUuid(uuid).orElseThrow();
-        materiaRepository.deleteById(materiaToDelete.getId());
+        materiaRepository.deleteByUuid(materiaToDelete.getUuid());
     }
 
     private MateriaDTO modelToDto(Materia materia){

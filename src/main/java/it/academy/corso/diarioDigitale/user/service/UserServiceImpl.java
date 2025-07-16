@@ -44,6 +44,12 @@ public class UserServiceImpl implements UserService{
             .toList();
     }
 
+    public List<UserDTO> getUserByRuoloStudente(String ruolo){
+        return userRepository.findByRuolo(ruolo).stream()
+            .map(this::modelToDTO)
+            .toList();
+    }
+
     @Override
     public void deleteUser(String uuid){
         User userToDelete = userRepository.findByUuid(uuid).orElseThrow();

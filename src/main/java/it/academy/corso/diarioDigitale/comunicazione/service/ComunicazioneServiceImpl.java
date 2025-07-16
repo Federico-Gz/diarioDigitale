@@ -51,8 +51,20 @@ public class ComunicazioneServiceImpl implements ComunicazioneService{
     @Override
     public void deleteByUuid(String uuid) {
         Comunicazione comunicazioneToDelete = comunicazioneRepository.findByUuid(uuid).orElseThrow();
-        comunicazioneRepository.deleteById(comunicazioneToDelete.getId());
+        comunicazioneRepository.deleteByUuid(comunicazioneToDelete.getUuid());
     }
+
+    public void inviaAGliStudenti(User docente, String testo) {
+    List<User> studenti = userRepository.findByRuolo("STUDENTE");
+    for (User studente : studenti) {
+        Comunicazione c = new Comunicazione();
+        c.setTesto(testo);
+        c.setStudente(studente);
+        c.setDocente(docente); // chi è il mittente
+        comunicazioneRepository.save(c);
+    }
+}
+
 
    private ComunicazioneDTO modelToDto(Comunicazione comunicazione){
         return ComunicazioneDTO.builder()
