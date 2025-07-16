@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface MateriaRepository extends JpaRepository<Materia, Long> {
     Optional<Materia> findByUuid(String Uuid);
     List<Materia> findByNomeContainingIgnoreCase(String nome);
+    void deleteByUuid(String uuid);
 }

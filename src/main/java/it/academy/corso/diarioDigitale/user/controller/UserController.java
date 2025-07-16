@@ -1,5 +1,7 @@
 package it.academy.corso.diarioDigitale.user.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,6 +48,20 @@ public class UserController {
             throw new RuntimeException("Credenziali non valide");
         }
         return userDTO;
+    }
+
+    //trova tutti gli user con ruolo = "studente"
+    @GetMapping("/studenti")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDTO> getUserByRuoloStudente(){
+        return userService.getUserByRuoloStudente("STUDENTE");
+    }
+
+    //trova tutti gli user con ruolo = "docente"
+    @GetMapping("/docenti")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserDTO> getUserByRuoloDocente(){
+        return userService.getUserByRuoloStudente("DOCENTE");
     }
     
 

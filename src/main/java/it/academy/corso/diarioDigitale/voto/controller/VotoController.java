@@ -22,22 +22,21 @@ public class VotoController {
 
 
     //aggiungere un voto
-
-    @PostMapping("/voti")
+    @PostMapping
     public VotoDTO salvaVoto(@RequestBody VotoDTO votoDTO){
         return votoService.salvaVoto(votoDTO);
     }
 
 
     //vedere tutti i voti di uno studente 
-    @GetMapping("/studente/{idStudente}")
-    public List<VotoDTO> getVotiStudente(@PathVariable String uuidStudente){
+    @GetMapping("/studente/{uuidStudente}")
+    public List<VotoDTO> getVotiStudente(@PathVariable("uuidStudente") String uuidStudente){
         return votoService.findByStudenteUuid(uuidStudente);
     }
 
     //vedere tutti i voti asseganti (docente)
-    @GetMapping("/docente/{idDocente}")
-    public List<VotoDTO> getVotiDocente(@PathVariable String uuidDocente){
+    @GetMapping("/docente/{uuidDocente}")
+    public List<VotoDTO> getVotiDocente(@PathVariable("uuidDocente") String uuidDocente){
         return votoService.findByDocenteUuid(uuidDocente);
     }
     //vedere tutti i voti di una materia specifica (STUDENTE)

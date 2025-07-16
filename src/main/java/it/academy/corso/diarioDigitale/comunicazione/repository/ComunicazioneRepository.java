@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface ComunicazioneRepository extends JpaRepository<Comunicazione, Long> {
 
     Optional<Comunicazione> findByUuid(String uuid);
-
+    void deleteByUuid(String uuid);
 }
