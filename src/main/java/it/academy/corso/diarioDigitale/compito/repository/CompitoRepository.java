@@ -10,7 +10,7 @@ import it.academy.corso.diarioDigitale.compito.model.Compito;
 
 @Repository
 public interface CompitoRepository extends JpaRepository<Compito, Long> {
-    List<Compito> findByDocenteUuid(String uuid);
+    List<Compito> findByDocente_Uuid(String uuid);
     List<Compito> findByStudenteUuid(String uuid);
     Optional<Compito> findByUuid(String uuid);
 }

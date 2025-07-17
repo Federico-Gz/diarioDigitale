@@ -10,5 +10,8 @@ public interface ComunicazioneService {
     ComunicazioneDTO findByUuid(String uuid);
     ComunicazioneDTO save(ComunicazioneDTO comunicazione);
     void deleteByUuid(String uuid);
+    void deleteByDocenteUuidAndTesto(String uuidDocente, String testo);
     void inviaAGliStudenti(User docente, String testo);
+    List<ComunicazioneDTO> findAllDistinctByDocente(String docenteUuid);
+    List<ComunicazioneDTO> findAllByDocenteUuid(String docenteUuid);
 }

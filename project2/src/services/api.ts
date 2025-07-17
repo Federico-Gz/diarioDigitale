@@ -197,12 +197,22 @@ export const comunicazioniApi = {
     return handleResponse(response);
   },
 
+  // Ottieni comunicazioni distinte per docente
+  getDistinctByDocente: async (
+    docenteUuid: string
+  ): Promise<Comunicazione[]> => {
+    const response = await fetch(
+      `${API_BASE_URL}/comunicazioni/dashboard-docente/${docenteUuid}`
+    );
+    return handleResponse(response);
+  },
+
   // Crea nuova comunicazione (solo docenti)
   create: async (comunicazione: ComunicazioneForm): Promise<Comunicazione> => {
     const response = await fetch(`${API_BASE_URL}/comunicazioni`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(comunicazione),
     });
@@ -210,11 +220,14 @@ export const comunicazioniApi = {
   },
 
   // Crea comunicazione generale (solo docenti)
-  createGenerale: async (comunicazione: { docenteUuid: string; testo: string }): Promise<void> => {
+  createGenerale: async (comunicazione: {
+    docenteUuid: string;
+    testo: string;
+  }): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/comunicazioni/generale`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(comunicazione),
     });
@@ -223,24 +236,46 @@ export const comunicazioniApi = {
     }
   },
 
-   // Elimina comunicazione
+  // Elimina comunicazione
   delete: async (uuid: string): Promise<void> => {
     if (!uuid || uuid === "null") {
-    throw new Error("UUID non valido per eliminazione");
+      throw new Error("UUID non valido per eliminazione");
     }
-    console.log('API: Eliminando comunicazione con UUID:', uuid);
+    console.log("API: Eliminando comunicazione con UUID:", uuid);
     const response = await fetch(`${API_BASE_URL}/comunicazioni/${uuid}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
-    console.log('API: Risposta eliminazione status:', response.status);
-    
+    console.log("API: Risposta eliminazione status:", response.status);
+
     if (!response.ok) {
-      console.error('API: Errore eliminazione:', response.status, response.statusText);
+      console.error(
+        "API: Errore eliminazione:",
+        response.status,
+        response.statusText
+      );
       const errorText = await response.text();
-      console.error('API: Dettagli errore:', errorText);
-      throw new Error(`Errore eliminazione: ${response.status} ${response.statusText}`);
+      console.error("API: Dettagli errore:", errorText);
+      throw new Error(
+        `Errore eliminazione: ${response.status} ${response.statusText}`
+      );
     }
-    
-    console.log('API: Comunicazione eliminata con successo');
+
+    console.log("API: Comunicazione eliminata con successo");
+  },
+
+  // Elimina tutte le comunicazioni con docenteUuid e testo
+  deleteByDocenteAndTesto: async (
+    uuidDocente: string,
+    testo: string
+  ): Promise<void> => {
+    const params = new URLSearchParams({ uuidDocente, testo });
+    const response = await fetch(
+      `${API_BASE_URL}/comunicazioni/by-docente-and-testo?${params.toString()}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (!response.ok)
+      throw new Error("Errore eliminazione comunicazioni multiple");
   },
 };

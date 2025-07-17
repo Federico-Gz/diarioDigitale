@@ -25,6 +25,12 @@ public class ComunicazioneController {
         return comunicazioneService.findAll();
     }
 
+    @GetMapping("/dashboard-docente/{docenteUuid}")
+    public List<ComunicazioneDTO> dashboardDocente(@PathVariable String docenteUuid) {
+        return comunicazioneService.findAllDistinctByDocente(docenteUuid);
+    }
+
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ComunicazioneDTO save (@RequestBody ComunicazioneDTO comunicazione){
@@ -35,6 +41,13 @@ public class ComunicazioneController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable String uuid){
         comunicazioneService.deleteByUuid(uuid);
+    }
+
+    // Elimina tutte le comunicazioni con uuidDocente e testo
+    @DeleteMapping("/by-docente-and-testo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteByDocenteAndTesto(@RequestParam String uuidDocente, @RequestParam String testo) {
+        comunicazioneService.deleteByDocenteUuidAndTesto(uuidDocente, testo);
     }
 
     @PostMapping("/generale")

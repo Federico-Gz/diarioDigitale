@@ -50,7 +50,7 @@ public class CompitoServiceImpl implements CompitoService {
 
     @Override
     public List<CompitoDTO> getCompitiByDocenteUuid(String uuid) {
-        List<Compito> compitiTrovati = compitoRepository.findByDocenteUuid(uuid);
+        List<Compito> compitiTrovati = compitoRepository.findByDocente_Uuid(uuid);
         return compitiTrovati.stream()
                 .map(this::modelToDTO)
                 .toList();

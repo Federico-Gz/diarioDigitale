@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { comunicazioniApi, authApi } from '../../services/api';
 import { Comunicazione, ComunicazioneForm, User as UserType } from '../../types';
 
+
 const ComunicazioniDocente: React.FC = () => {
   const { user } = useAuth();
   const [comunicazioni, setComunicazioni] = useState<Comunicazione[]>([]);
@@ -20,13 +21,16 @@ const ComunicazioniDocente: React.FC = () => {
 
   // Carica le comunicazioni al mount del componente
   useEffect(() => {
-    loadComunicazioni();
-    loadStudenti();
+    if(user){
+      loadComunicazioni();
+      loadStudenti();
+    }
   }, []);
 
   const loadComunicazioni = async () => {
+    if (!user) return;
     try {
-      const data = await comunicazioniApi.getAll();
+      const data = await comunicazioniApi.getDistinctByDocente(user!.uuid);
       setComunicazioni(data);
     } catch (error) {
       setMessage({ type: 'error', text: 'Errore nel caricamento delle comunicazioni' });
@@ -98,19 +102,21 @@ const ComunicazioniDocente: React.FC = () => {
   };
 
   // Gestisce l'eliminazione di una comunicazione
-  const handleDelete = async (uuid: string) => {
+  const handleDelete = async (comunicazione: Comunicazione) => {
     if (!window.confirm('Sei sicuro di voler eliminare questa comunicazione?')) {
       return;
     }
 
     try {
-      await comunicazioniApi.delete(uuid);
-      setComunicazioni(prev => prev.filter(com => com.uuid !== uuid));
+      await comunicazioniApi.delete(comunicazione.uuid);
+      await comunicazioniApi.deleteByDocenteAndTesto(comunicazione.docenteUuid, comunicazione.testo);
+      setComunicazioni(prev => prev.filter(com => com.uuid !== comunicazione.uuid));
       setMessage({ type: 'success', text: 'Comunicazione eliminata con successo!' });
     } catch (error) {
       setMessage({ type: 'error', text: 'Errore nell\'eliminazione della comunicazione' });
     }
   };
+
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -275,7 +281,7 @@ const ComunicazioniDocente: React.FC = () => {
                       </span>
                     </div>
                     <button
-                      onClick={() => handleDelete(comunicazione.uuid)}
+                      onClick={() => handleDelete(comunicazione)}
                       className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                       title="Elimina comunicazione"
                     >
