@@ -17,6 +17,7 @@ export interface Materia {
 export interface Compito {
   uuid: string;
   descrizione: string;
+  completato:boolean;
   scadenza: string; // LocalDate viene serializzato come string
   materiaUuid: string;
   docenteUuid: string;
