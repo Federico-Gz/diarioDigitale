@@ -19,16 +19,27 @@ const CompitiStudente: React.FC = () => {
     }
   }, [user]);
 
+  // Ascolta per aggiornamenti quando viene assegnato un nuovo compito
+  useEffect(() => {
+    const handleCompitoAssegnato = () => {
+      loadData();
+    };
+
+    window.addEventListener('compitoAssegnato', handleCompitoAssegnato);
+    
+    return () => {
+      window.removeEventListener('compitoAssegnato', handleCompitoAssegnato);
+    };
+  }, []);
+
   const loadData = async () => {
     if (!user) return;
     
     setLoading(true);
     try {
-      // Carica tutti i compiti (in un'app reale avresti un endpoint specifico per studente)
-      const compitiData = await compitiApi.getAll();
-      // Filtra solo i compiti assegnati a questo studente
-      const compitiStudente = compitiData.filter(compito => compito.studenteUuid === user.uuid);
-      setCompiti(compitiStudente);
+      // Carica tutti i compiti e filtra quelli dello studente
+      const compitiData = await compitiApi.getByStudente(user.uuid);
+      setCompiti(compitiData);
 
       // Carica le materie
       const materieData = await materieApi.getAll();

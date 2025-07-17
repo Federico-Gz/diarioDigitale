@@ -124,6 +124,7 @@ public class CompitoServiceImpl implements CompitoService {
                 .scadenza(model.getScadenza())
                 .docenteUuid(model.getDocente().getUuid())
                 .materiaUuid(model.getMateria().getUuid())
+                .studenteUuid(model.getStudente().getUuid())
                 .build();
     }
 

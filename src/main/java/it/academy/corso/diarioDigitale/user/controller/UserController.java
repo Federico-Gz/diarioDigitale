@@ -63,7 +63,5 @@ public class UserController {
     public List<UserDTO> getUserByRuoloDocente(){
         return userService.getUserByRuoloStudente("DOCENTE");
     }
-    
-
 
 }

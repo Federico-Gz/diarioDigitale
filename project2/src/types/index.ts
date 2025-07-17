@@ -75,4 +75,5 @@ export interface MessaggioForm {
 export interface ComunicazioneForm {
   testo: string;
   studenteUuid: string;
+  docenteUuid: string;
 }

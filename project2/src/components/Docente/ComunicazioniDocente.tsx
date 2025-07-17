@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, Send, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { comunicazioniApi, userApi } from '../../services/api';
+import { comunicazioniApi, authApi } from '../../services/api';
 import { Comunicazione, ComunicazioneForm, User as UserType } from '../../types';
 
 const ComunicazioniDocente: React.FC = () => {
@@ -12,34 +12,33 @@ const ComunicazioniDocente: React.FC = () => {
   const [formData, setFormData] = useState<ComunicazioneForm>({
     testo: '',
     studenteUuid: '',
+    docenteUuid: ''
   });
+  const [isGenerale, setIsGenerale] = useState(true);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Carica le comunicazioni al mount del componente
   useEffect(() => {
-    loadStudenti();
     loadComunicazioni();
+    loadStudenti();
   }, []);
 
-  const loadStudenti = async () => {
-      try {
-        const data = await userApi.getStudenti();
-        setStudenti(data);
-      } catch (error) {
-        setMessage({
-          type: "error",
-          text: "Errore nel caricamento degli studenti",
-        });
-      }
-    };
-    
   const loadComunicazioni = async () => {
     try {
       const data = await comunicazioniApi.getAll();
       setComunicazioni(data);
     } catch (error) {
       setMessage({ type: 'error', text: 'Errore nel caricamento delle comunicazioni' });
+    }
+  };
+
+  const loadStudenti = async () => {
+    try {
+      const studentiData = await authApi.getStudenti();
+      setStudenti(studentiData);
+    } catch (error) {
+      console.log('Impossibile caricare gli studenti');
     }
   };
 
@@ -63,14 +62,20 @@ const ComunicazioniDocente: React.FC = () => {
     setMessage(null);
 
     try {
-      await comunicazioniApi.inviaGenerale({
-        testo: formData.testo,
-        docenteUuid: user.uuid,
-    }).catch((err) => {
-      console.error('Errore durante la chiamata a inviaGenerale', err);
-      throw new Error('Errore nell’invio della comunicazione al server');
-    });
-
+      if (isGenerale) {
+        // Comunicazione generale a tutti gli studenti
+        await comunicazioniApi.createGenerale({
+          docenteUuid: user.uuid,
+          testo: formData.testo,
+        });
+      } else {
+        // Comunicazione specifica per uno studente
+        await comunicazioniApi.create({
+          testo: formData.testo,
+          studenteUuid: formData.studenteUuid,
+          docenteUuid: user.uuid,
+        });
+      }
 
       setMessage({ type: 'success', text: 'Comunicazione inviata con successo!' });
       
@@ -78,10 +83,13 @@ const ComunicazioniDocente: React.FC = () => {
       setFormData({
         testo: '',
         studenteUuid: '',
+        docenteUuid: ''
       });
 
       // Ricarica le comunicazioni
-      loadComunicazioni();
+      setTimeout(() => {
+        loadComunicazioni();
+      }, 1000);
     } catch (error) {
       setMessage({ type: 'error', text: 'Errore nell\'invio della comunicazione' });
     } finally {
@@ -146,8 +154,8 @@ const ComunicazioniDocente: React.FC = () => {
                     type="radio"
                     name="tipo"
                     value="generale"
-                    checked={!formData.studenteUuid}
-                    onChange={() => setFormData(prev => ({ ...prev, studenteUuid: '' }))}
+                    checked={isGenerale}
+                    onChange={() => setIsGenerale(true)}
                     className="mr-2"
                   />
                   <span className="text-sm">Comunicazione Generale</span>
@@ -157,8 +165,8 @@ const ComunicazioniDocente: React.FC = () => {
                     type="radio"
                     name="tipo"
                     value="specifica"
-                    checked={!!formData.studenteUuid}
-                    onChange={() => setFormData(prev => ({ ...prev, studenteUuid: 'placeholder' }))}
+                    checked={!isGenerale}
+                    onChange={() => setIsGenerale(false)}
                     className="mr-2"
                   />
                   <span className="text-sm">Studente Specifico</span>
@@ -167,7 +175,7 @@ const ComunicazioniDocente: React.FC = () => {
             </div>
 
             {/* Selezione Studente (solo se comunicazione specifica) */}
-            {formData.studenteUuid && (
+            {!isGenerale && (
               <div>
                 <label htmlFor="studenteUuid" className="block text-sm font-medium text-gray-700 mb-2">
                   Studente *
@@ -211,7 +219,10 @@ const ComunicazioniDocente: React.FC = () => {
                 placeholder="Scrivi la comunicazione..."
               />
               <p className="mt-1 text-sm text-gray-500">
-                Scrivi una comunicazione chiara e informativa
+                {isGenerale 
+                  ? 'Questa comunicazione sarà inviata a tutti gli studenti'
+                  : 'Scrivi una comunicazione per lo studente selezionato'
+                }
               </p>
             </div>
 
@@ -260,7 +271,7 @@ const ComunicazioniDocente: React.FC = () => {
                     <div className="flex items-center space-x-2">
                       <Bell className="h-4 w-4 text-orange-600" />
                       <span className="text-sm font-medium text-gray-900">
-                        Comunicazione Generale
+                        Comunicazione
                       </span>
                     </div>
                     <button

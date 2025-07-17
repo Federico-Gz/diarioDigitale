@@ -35,32 +35,33 @@ public class ComunicazioneServiceImpl implements ComunicazioneService{
         return ret;
     }
 
-    @Override
-    public ComunicazioneDTO save(ComunicazioneDTO comunicazioneDto) {
+    //@Override
+    //public ComunicazioneDTO save(ComunicazioneDTO comunicazioneDto) {
 
-        User studente = userRepository.findByUuid(comunicazioneDto.getStudenteUuid()).orElseThrow(() -> new EntityNotFoundException("Studente non trovato"));
-        User docente = userRepository.findByUuid(comunicazioneDto.getDocenteUuid()).orElseThrow(() -> new EntityNotFoundException("Docente non trovato"));
+        //User studente = userRepository.findByUuid(comunicazioneDto.getStudenteUuid()).orElseThrow(() -> new EntityNotFoundException("Studente non trovato"));
+        //User docente = userRepository.findByUuid(comunicazioneDto.getDocenteUuid()).orElseThrow(() -> new EntityNotFoundException("Docente non trovato"));
 
         
-        comunicazioneDto.setUuid(UUID.randomUUID().toString());
-        Comunicazione comunicazione = dtoToModel(comunicazioneDto, studente, docente);
+        //comunicazioneDto.setUuid(UUID.randomUUID().toString());
+        //Comunicazione comunicazione = dtoToModel(comunicazioneDto, studente, docente);
 
-        return modelToDto(comunicazioneRepository.save(comunicazione));
-    }
+        //return modelToDto(comunicazioneRepository.save(comunicazione));
+   // }
 
     @Override
     public void deleteByUuid(String uuid) {
         Comunicazione comunicazioneToDelete = comunicazioneRepository.findByUuid(uuid).orElseThrow();
-        comunicazioneRepository.deleteByUuid(comunicazioneToDelete.getUuid());
+        comunicazioneRepository.delete(comunicazioneToDelete);
     }
 
     public void inviaAGliStudenti(User docente, String testo) {
     List<User> studenti = userRepository.findByRuolo("STUDENTE");
     for (User studente : studenti) {
         Comunicazione c = new Comunicazione();
+        c.setUuid(UUID.randomUUID().toString());
         c.setTesto(testo);
         c.setStudente(studente);
-        c.setDocente(docente); // chi è il mittente
+        c.setDocente(docente); //chi è il mittente
         comunicazioneRepository.save(c);
     }
 }
@@ -69,6 +70,8 @@ public class ComunicazioneServiceImpl implements ComunicazioneService{
    private ComunicazioneDTO modelToDto(Comunicazione comunicazione){
         return ComunicazioneDTO.builder()
                 .uuid(comunicazione.getUuid())
+                .docenteUuid(comunicazione.getDocente().getUuid())
+                .studenteUuid(comunicazione.getStudente().getUuid())
                 .testo(comunicazione.getTesto())
                 .build();
    }

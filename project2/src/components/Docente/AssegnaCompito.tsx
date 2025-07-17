@@ -1,16 +1,17 @@
-// Componente per assegnare voti agli studenti
+// Componente per assegnare compiti agli studenti
 import React, { useState, useEffect } from 'react';
-import { GraduationCap, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import { FileText, Save, AlertCircle, CheckCircle, Calendar } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { votiApi, authApi, materieApi, userApi } from '../../services/api';
-import { VotoForm, User, Materia } from '../../types';
+import { compitiApi, materieApi, authApi } from '../../services/api';
+import { CompitoForm, User, Materia } from '../../types';
 
-const AssegnaVoto: React.FC = () => {
+const AssegnaCompito: React.FC = () => {
   const { user } = useAuth();
-  const [formData, setFormData] = useState<VotoForm>({
-    valore: 0,
-    studenteUuid: '',
+  const [formData, setFormData] = useState<CompitoForm>({
+    descrizione: '',
+    scadenza: '',
     materiaUuid: '',
+    studenteUuid: '',
   });
   const [studenti, setStudenti] = useState<User[]>([]);
   const [materie, setMaterie] = useState<Materia[]>([]);
@@ -29,19 +30,20 @@ const AssegnaVoto: React.FC = () => {
       setMaterie(materieData);
       
       // Carica gli studenti
-      const studentiData = await userApi.getStudenti();
+      const studentiData = await authApi.getStudenti();
       setStudenti(studentiData);
     } catch (error) {
+      console.error('Errore caricamento studenti:', error);
       setMessage({ type: 'error', text: 'Errore nel caricamento dei dati' });
     }
   };
 
   // Gestisce i cambiamenti nei campi del form
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'valore' ? parseFloat(value) : value,
+      [name]: value,
     }));
     // Rimuovi il messaggio quando l'utente modifica il form
     if (message) setMessage(null);
@@ -56,25 +58,38 @@ const AssegnaVoto: React.FC = () => {
     setMessage(null);
 
     try {
-      // Assegna il voto chiamando l'API
-      await votiApi.create({
+      // Assegna il compito chiamando l'API
+      await compitiApi.create({
         ...formData,
         docenteUuid: user.uuid,
       });
 
-      setMessage({ type: 'success', text: 'Voto assegnato con successo!' });
+      setMessage({ type: 'success', text: 'Compito assegnato con successo!' });
       
       // Reset del form
       setFormData({
-        valore: 0,
-        studenteUuid: '',
+        descrizione: '',
+        scadenza: '',
         materiaUuid: '',
+        studenteUuid: '',
       });
+
+      // Emetti evento per aggiornare altri componenti
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('compitoAssegnato'));
+      }, 1000);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Errore nell\'assegnazione del voto' });
+      console.error('Errore assegnazione compito:', error);
+      setMessage({ type: 'error', text: 'Errore nell\'assegnazione del compito' });
     } finally {
       setLoading(false);
     }
+  };
+
+  // Ottieni la data minima (oggi)
+  const getMinDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
   };
 
   return (
@@ -82,8 +97,8 @@ const AssegnaVoto: React.FC = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         {/* Header */}
         <div className="flex items-center mb-6">
-          <GraduationCap className="h-6 w-6 text-blue-600 mr-2" />
-          <h2 className="text-xl font-bold text-gray-900">Assegna Voto</h2>
+          <FileText className="h-6 w-6 text-green-600 mr-2" />
+          <h2 className="text-xl font-bold text-gray-900">Assegna Compito</h2>
         </div>
 
         {/* Messaggio di feedback */}
@@ -119,7 +134,7 @@ const AssegnaVoto: React.FC = () => {
               required
               value={formData.studenteUuid}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
             >
               <option value="">Seleziona uno studente</option>
               {studenti.map((studente) => (
@@ -146,7 +161,7 @@ const AssegnaVoto: React.FC = () => {
               required
               value={formData.materiaUuid}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
             >
               <option value="">Seleziona una materia</option>
               {materie.map((materia) => (
@@ -157,26 +172,48 @@ const AssegnaVoto: React.FC = () => {
             </select>
           </div>
 
-          {/* Valore del Voto */}
+          {/* Descrizione del Compito */}
           <div>
-            <label htmlFor="valore" className="block text-sm font-medium text-gray-700 mb-2">
-              Voto *
+            <label htmlFor="descrizione" className="block text-sm font-medium text-gray-700 mb-2">
+              Descrizione del Compito *
             </label>
-            <input
-              type="number"
-              id="valore"
-              name="valore"
-              min="1"
-              max="10"
-              step="0.5"
+            <textarea
+              id="descrizione"
+              name="descrizione"
+              rows={4}
               required
-              value={formData.valore || ''}
+              value={formData.descrizione}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Inserisci il voto (1-10)"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
+              placeholder="Descrivi il compito da assegnare..."
             />
             <p className="mt-1 text-sm text-gray-500">
-              Inserisci un voto da 1 a 10 (sono ammessi decimali come 7.5)
+              Fornisci una descrizione chiara e dettagliata del compito
+            </p>
+          </div>
+
+          {/* Data di Scadenza */}
+          <div>
+            <label htmlFor="scadenza" className="block text-sm font-medium text-gray-700 mb-2">
+              Data di Scadenza *
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Calendar className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="date"
+                id="scadenza"
+                name="scadenza"
+                required
+                min={getMinDate()}
+                value={formData.scadenza}
+                onChange={handleChange}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
+              />
+            </div>
+            <p className="mt-1 text-sm text-gray-500">
+              Seleziona la data entro cui il compito deve essere completato
             </p>
           </div>
 
@@ -184,7 +221,7 @@ const AssegnaVoto: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? (
               <div className="flex items-center space-x-2">
@@ -194,7 +231,7 @@ const AssegnaVoto: React.FC = () => {
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                Assegna Voto
+                Assegna Compito
               </>
             )}
           </button>
@@ -204,4 +241,4 @@ const AssegnaVoto: React.FC = () => {
   );
 };
 
-export default AssegnaVoto;
+export default AssegnaCompito;

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,7 +28,6 @@ public class ComunicazioneController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ComunicazioneDTO save (@RequestBody ComunicazioneDTO comunicazione){
-        comunicazione.setUuid(UUID.randomUUID().toString());
         return comunicazioneService.save(comunicazione);
     }
 

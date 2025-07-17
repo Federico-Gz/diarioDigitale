@@ -2,13 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart3, User, BookOpen, GraduationCap } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { votiApi, materieApi } from '../../services/api';
-import { Voto, Materia } from '../../types';
+import { votiApi, materieApi, authApi } from '../../services/api';
+import { Voto, Materia, User as UserType } from '../../types';
 
 const RegistroVoti: React.FC = () => {
   const { user } = useAuth();
   const [voti, setVoti] = useState<Voto[]>([]);
   const [materie, setMaterie] = useState<Materia[]>([]);
+  const [studenti, setStudenti] = useState<UserType[]>([]);
   const [selectedMateria, setSelectedMateria] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
@@ -18,6 +19,19 @@ const RegistroVoti: React.FC = () => {
       loadData();
     }
   }, [user]);
+
+  // Ascolta per aggiornamenti quando viene assegnato un nuovo voto
+  useEffect(() => {
+    const handleVotoAssegnato = () => {
+      loadData();
+    };
+
+    window.addEventListener('votoAssegnato', handleVotoAssegnato);
+    
+    return () => {
+      window.removeEventListener('votoAssegnato', handleVotoAssegnato);
+    };
+  }, []);
 
   const loadData = async () => {
     if (!user) return;
@@ -31,6 +45,12 @@ const RegistroVoti: React.FC = () => {
       // Carica le materie
       const materieData = await materieApi.getAll();
       setMaterie(materieData);
+
+      // Carica gli studenti
+      const studentiData = await authApi.getStudenti();
+      setStudenti(studentiData);
+      console.log('Voti caricati:', votiData);
+      console.log('Studenti caricati:', studentiData);
     } catch (error) {
       console.error('Errore nel caricamento dei dati:', error);
     } finally {
@@ -63,6 +83,12 @@ const RegistroVoti: React.FC = () => {
   const getNomeMateria = (materiaUuid: string) => {
     const materia = materie.find(m => m.uuid === materiaUuid);
     return materia?.nome || 'Materia sconosciuta';
+  };
+
+  // Ottieni il nome dello studente dall'UUID
+  const getStudenteName = (studenteUuid: string) => {
+    const studente = studenti.find(s => s.uuid === studenteUuid);
+    return studente ? `${studente.nome} ${studente.cognome}` : `Studente ${studenteUuid.substring(0, 8)}...`;
   };
 
   if (loading) {
@@ -186,7 +212,7 @@ const RegistroVoti: React.FC = () => {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            Studente {studenteUuid.substring(0, 8)}...
+                            {getStudenteName(studenteUuid)}
                           </div>
                           <div className="text-sm text-gray-500">
                             {votiStudente.length} vot{votiStudente.length === 1 ? 'o' : 'i'}

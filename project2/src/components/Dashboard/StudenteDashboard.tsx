@@ -1,7 +1,6 @@
 // Dashboard principale per gli studenti
 import React, { useState } from 'react';
 import { 
-  BookOpen, 
   GraduationCap, 
   MessageSquare, 
   FileText, 

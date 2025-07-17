@@ -1,17 +1,17 @@
-// Componente per gestire i messaggi del docente
+// Componente per visualizzare i messaggi dello studente
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Send, User, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { messaggiApi, userApi } from '../../services/api';
+import { messaggiApi, authApi } from '../../services/api';
 import { Messaggio, MessaggioForm, User as UserType } from '../../types';
 
-const MessaggiDocente: React.FC = () => {
+const MessaggiStudente: React.FC = () => {
   const { user } = useAuth();
   const [messaggi, setMessaggi] = useState<Messaggio[]>([]);
-  const [studenti, setStudenti] = useState<UserType[]>([]);
+  const [docenti, setDocenti] = useState<UserType[]>([]);
   const [formData, setFormData] = useState<MessaggioForm>({
     contenuto: '',
-    studenteUuid: '',
+    docenteUuid: '',
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -19,31 +19,28 @@ const MessaggiDocente: React.FC = () => {
   // Carica i messaggi al mount del componente
   useEffect(() => {
     if (user) {
-      loadStudenti();
       loadMessaggi();
+      loadDocenti();
     }
   }, [user]);
 
-  const loadStudenti = async () => {
-    try {
-      const data = await userApi.getStudenti();
-      setStudenti(data);
-    } catch (error) {
-      setMessage({
-        type: "error",
-        text: "Errore nel caricamento degli studenti",
-      });
-    }
-  };
-  
   const loadMessaggi = async () => {
     if (!user) return;
     
     try {
-      const data = await messaggiApi.getByDocente(user.uuid);
+      const data = await messaggiApi.getByStudente(user.uuid);
       setMessaggi(data);
     } catch (error) {
       setMessage({ type: 'error', text: 'Errore nel caricamento dei messaggi' });
+    }
+  };
+
+  const loadDocenti = async () => {
+    try {
+      const docentiData = await authApi.getDocenti();
+      setDocenti(docentiData);
+    } catch (error) {
+      console.log('Impossibile caricare i docenti');
     }
   };
 
@@ -69,7 +66,7 @@ const MessaggiDocente: React.FC = () => {
     try {
       await messaggiApi.create({
         ...formData,
-        docenteUuid: user.uuid,
+        studenteUuid: user.uuid,
       });
 
       setMessage({ type: 'success', text: 'Messaggio inviato con successo!' });
@@ -77,7 +74,7 @@ const MessaggiDocente: React.FC = () => {
       // Reset del form
       setFormData({
         contenuto: '',
-        studenteUuid: '',
+        docenteUuid: '',
       });
 
       // Ricarica i messaggi
@@ -120,29 +117,29 @@ const MessaggiDocente: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Selezione Studente */}
+            {/* Selezione Docente */}
             <div>
-              <label htmlFor="studenteUuid" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="docenteUuid" className="block text-sm font-medium text-gray-700 mb-2">
                 Destinatario *
               </label>
               <select
-                id="studenteUuid"
-                name="studenteUuid"
+                id="docenteUuid"
+                name="docenteUuid"
                 required
-                value={formData.studenteUuid}
+                value={formData.docenteUuid}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">Seleziona uno studente</option>
-                {studenti.map((studente) => (
-                  <option key={studente.uuid} value={studente.uuid}>
-                    {studente.nome} {studente.cognome}
+                <option value="">Seleziona un docente</option>
+                {docenti.map((docente) => (
+                  <option key={docente.uuid} value={docente.uuid}>
+                    Prof. {docente.nome} {docente.cognome}
                   </option>
                 ))}
               </select>
-              {studenti.length === 0 && (
+              {docenti.length === 0 && (
                 <p className="mt-1 text-sm text-gray-500">
-                  Nessuno studente disponibile. Aggiungi studenti al sistema.
+                  Nessun docente disponibile nel sistema.
                 </p>
               )}
             </div>
@@ -189,19 +186,19 @@ const MessaggiDocente: React.FC = () => {
           </form>
         </div>
 
-        {/* Lista messaggi inviati */}
+        {/* Lista messaggi ricevuti */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center mb-6">
             <MessageSquare className="h-6 w-6 text-purple-600 mr-2" />
-            <h2 className="text-xl font-bold text-gray-900">Messaggi Inviati</h2>
+            <h2 className="text-xl font-bold text-gray-900">Messaggi Ricevuti</h2>
           </div>
 
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {messaggi.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>Nessun messaggio inviato</p>
-                <p className="text-sm">I tuoi messaggi appariranno qui</p>
+                <p>Nessun messaggio ricevuto</p>
+                <p className="text-sm">I messaggi dai tuoi docenti appariranno qui</p>
               </div>
             ) : (
               messaggi.map((messaggio) => (
@@ -216,7 +213,7 @@ const MessaggiDocente: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-medium text-gray-900">
-                          A: {messaggio.nomeStudente || 'Studente'}
+                          Da: {messaggio.nomeDocente || 'Docente'}
                         </h4>
                       </div>
                       <p className="text-gray-700 text-sm">{messaggio.contenuto}</p>
@@ -232,4 +229,4 @@ const MessaggiDocente: React.FC = () => {
   );
 };
 
-export default MessaggiDocente;
+export default MessaggiStudente;

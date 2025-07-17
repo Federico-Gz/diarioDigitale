@@ -19,6 +19,19 @@ const VotiStudente: React.FC = () => {
     }
   }, [user]);
 
+  // Ascolta per aggiornamenti quando viene assegnato un nuovo voto
+  useEffect(() => {
+    const handleVotoAssegnato = () => {
+      loadData();
+    };
+
+    window.addEventListener('votoAssegnato', handleVotoAssegnato);
+    
+    return () => {
+      window.removeEventListener('votoAssegnato', handleVotoAssegnato);
+    };
+  }, []);
+
   const loadData = async () => {
     if (!user) return;
     

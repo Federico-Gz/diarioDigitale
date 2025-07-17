@@ -98,7 +98,7 @@ public class VotoServiceImpl implements VotoService {
             .build();
         }
 
-    private Voto dtoToModel(VotoDTO votoDTO, User studente, User docente, Materia materia){
+    private Voto dtoToModel(VotoDTO votoDTO, User docente, User studente, Materia materia){
         return Voto.builder()
         .uuid(votoDTO.getUuid())
         .valore(votoDTO.getValore())

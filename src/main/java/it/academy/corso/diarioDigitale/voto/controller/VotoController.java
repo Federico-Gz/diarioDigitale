@@ -20,13 +20,11 @@ public class VotoController {
     
     private final VotoService votoService;
 
-
     //aggiungere un voto
     @PostMapping
     public VotoDTO salvaVoto(@RequestBody VotoDTO votoDTO){
         return votoService.salvaVoto(votoDTO);
     }
-
 
     //vedere tutti i voti di uno studente 
     @GetMapping("/studente/{uuidStudente}")

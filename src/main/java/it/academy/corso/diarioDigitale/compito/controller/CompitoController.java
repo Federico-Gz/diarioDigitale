@@ -54,4 +54,18 @@ public class CompitoController {
         compitoService.deleteCompito(uuid);
     }
 
+    // Ottieni compiti per studente
+    @GetMapping("/studente/{uuid}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CompitoDTO> getCompitiByStudente(@PathVariable String uuid) {
+        return compitoService.getCompitiByStudenteUuid(uuid);
+    }
+
+    // Ottieni compiti per docente
+    @GetMapping("/docente/{uuid}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CompitoDTO> getCompitiByDocente(@PathVariable String uuid) {
+        return compitoService.getCompitiByDocenteUuid(uuid);
+    }
+
 }
