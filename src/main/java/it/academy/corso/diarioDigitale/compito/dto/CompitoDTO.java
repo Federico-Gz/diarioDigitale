@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,6 +22,8 @@ public class CompitoDTO {
     @NotNull
     @NotEmpty
     private String descrizione;
+
+    private boolean completato;
 
     @NotNull
     private LocalDate scadenza;
@@ -36,4 +39,5 @@ public class CompitoDTO {
     @NotNull
     @NotEmpty
     private String studenteUuid;
+
 }

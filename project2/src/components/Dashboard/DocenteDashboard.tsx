@@ -1,5 +1,5 @@
 // Dashboard principale per i docenti
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   BookOpen, 
   Users, 
@@ -19,12 +19,39 @@ import GestisciMaterie from '../Docente/GestisciMaterie';
 import MessaggiDocente from '../Docente/MessaggiDocente';
 import ComunicazioniDocente from '../Docente/ComunicazioniDocente';
 import RegistroVoti from '../Docente/RegistroVoti';
+import { compitiApi, messaggiApi, votiApi } from '../../services/api';
 
 type ActiveSection = 'overview' | 'voti' | 'compiti' | 'materie' | 'messaggi' | 'comunicazioni' | 'registro';
 
 const DocenteDashboard: React.FC = () => {
   const { user } = useAuth();
   const [activeSection, setActiveSection] = useState<ActiveSection>('overview');
+
+  // stati per riepilogo
+  const [votiCount, setVotiCount] = useState<number | null>(null);
+  const [compitiCount, setCompitiCount] = useState<number | null>(null);
+  const [messaggiCount, setMessaggiCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      caricaDatiRiepilogo();
+    }
+  }, [user]);
+
+  const caricaDatiRiepilogo = async () => {
+    try {
+      const [voti, compiti, messaggi] = await Promise.all([
+        votiApi.getByDocente(user.uuid),
+        compitiApi.getByDocente(user.uuid),
+        messaggiApi.getByDocente(user.uuid)
+      ]);
+      setVotiCount(voti.length);
+      setCompitiCount(compiti.length);
+      setMessaggiCount(messaggi.length);
+    } catch (err) {
+      console.error('Errore nel caricamento dei dati', err);
+    }
+  };
 
   // Menu items per la navigazione
   const menuItems = [
@@ -66,7 +93,7 @@ const DocenteDashboard: React.FC = () => {
                   <GraduationCap className="h-8 w-8 text-blue-500" />
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Voti Assegnati</p>
-                    <p className="text-2xl font-bold text-gray-900">-</p>
+                    <p className="text-2xl font-bold text-gray-900">{votiCount !== null ? votiCount : '...'}</p>
                   </div>
                 </div>
               </div>
@@ -76,7 +103,7 @@ const DocenteDashboard: React.FC = () => {
                   <FileText className="h-8 w-8 text-green-500" />
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Compiti Assegnati</p>
-                    <p className="text-2xl font-bold text-gray-900">-</p>
+                    <p className="text-2xl font-bold text-gray-900">{compitiCount !== null ? compitiCount : '...'}</p>
                   </div>
                 </div>
               </div>
@@ -86,7 +113,7 @@ const DocenteDashboard: React.FC = () => {
                   <MessageSquare className="h-8 w-8 text-purple-500" />
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Messaggi</p>
-                    <p className="text-2xl font-bold text-gray-900">-</p>
+                    <p className="text-2xl font-bold text-gray-900">{messaggiCount !== null ? messaggiCount : '...'}</p>
                   </div>
                 </div>
               </div>

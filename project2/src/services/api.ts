@@ -103,6 +103,7 @@ export const compitiApi = {
     return handleResponse(response);
   },
 
+
   // Ottieni compiti per docente
   getByDocente: async (docenteUuid: string): Promise<Compito[]> => {
     const response = await fetch(`${API_BASE_URL}/compiti/docente/${docenteUuid}`);
@@ -132,6 +133,16 @@ export const compitiApi = {
     await fetch(`${API_BASE_URL}/compiti/${uuid}`, {
       method: 'DELETE',
     });
+  },
+
+  // Segna compito come completato (studenti)
+  markAsCompleted: async (uuid: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/compiti/${uuid}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
   },
 };
 

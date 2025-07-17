@@ -37,6 +37,9 @@ public class Compito {
     @Column(nullable = false)
     private LocalDate scadenza;
 
+    @Column(nullable = false)
+    private boolean completato;
+
     @ManyToOne
     @JoinColumn(name = "id_materia", nullable = false)
     private Materia materia;

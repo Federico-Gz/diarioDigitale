@@ -1,5 +1,5 @@
 // Dashboard principale per gli studenti
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   GraduationCap, 
   MessageSquare, 
@@ -15,6 +15,7 @@ import VotiStudente from '../Studente/VotiStudente';
 import CompitiStudente from '../Studente/CompitiStudente';
 import MessaggiStudente from '../Studente/MessaggiStudente';
 import ComunicazioniStudente from '../Studente/ComunicazioniStudente';
+import { compitiApi, comunicazioniApi, votiApi } from '../../services/api';
 
 type ActiveSection = 'overview' | 'voti' | 'compiti' | 'messaggi' | 'comunicazioni';
 
@@ -22,6 +23,41 @@ const StudenteDashboard: React.FC = () => {
   const { user } = useAuth();
   const [activeSection, setActiveSection] = useState<ActiveSection>('overview');
 
+  // Stati per i dati riepilogo
+  const [mediaVoti, setMediaVoti] = useState<number | null>(null);
+  const [compitiDaFare, setCompitiDaFare] = useState<number | null>(null);
+  const [comunicazioni, setComunicazioni] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    async function fetchDashboardData() {
+      try {
+        // Recupera voti e calcola media
+        const voti = await votiApi.getByStudente(user.uuid);
+        const media = voti.length > 0 ? voti.reduce((acc, v) => acc + v.valore, 0) / voti.length : 0;
+        setMediaVoti(media);
+
+        // Recupera compiti assegnati e conta quelli non ancora completati
+        const compiti = await compitiApi.getByStudente(user.uuid);
+        // Esempio: consideriamo compiti da fare quelli con data scadenza futura e non completati
+        const oggi = new Date();
+        const daFareCount = compiti.filter(c => !c.completato && new Date(c.scadenza) >= oggi).length;
+        setCompitiDaFare(daFareCount);
+
+
+        // Recupera comunicazioni e conta quelle recenti o tutte (a seconda della logica)
+        const comms = await comunicazioniApi.getAll();
+        // Per esempio: considera tutte le comunicazioni visibili
+        setComunicazioni(comms.length);
+
+      } catch (error) {
+        console.error('Errore caricamento dati dashboard:', error);
+      }
+    }
+
+    fetchDashboardData();
+  }, [user]);
   // Menu items per la navigazione
   const menuItems = [
     { id: 'overview' as ActiveSection, label: 'Panoramica', icon: BarChart3 },
@@ -56,7 +92,7 @@ const StudenteDashboard: React.FC = () => {
                   <GraduationCap className="h-8 w-8 text-blue-500" />
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Media Voti</p>
-                    <p className="text-2xl font-bold text-gray-900">-</p>
+                    <p className="text-2xl font-bold text-gray-900">{mediaVoti}</p>
                   </div>
                 </div>
               </div>
@@ -66,7 +102,7 @@ const StudenteDashboard: React.FC = () => {
                   <FileText className="h-8 w-8 text-green-500" />
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Compiti da Fare</p>
-                    <p className="text-2xl font-bold text-gray-900">-</p>
+                    <p className="text-2xl font-bold text-gray-900">{compitiDaFare}</p>
                   </div>
                 </div>
               </div>
@@ -86,7 +122,7 @@ const StudenteDashboard: React.FC = () => {
                   <Bell className="h-8 w-8 text-orange-500" />
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Comunicazioni</p>
-                    <p className="text-2xl font-bold text-gray-900">-</p>
+                    <p className="text-2xl font-bold text-gray-900">{comunicazioni}</p>
                   </div>
                 </div>
               </div>

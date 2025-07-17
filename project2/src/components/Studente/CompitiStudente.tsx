@@ -11,6 +11,7 @@ const CompitiStudente: React.FC = () => {
   const [materie, setMaterie] = useState<Materia[]>([]);
   const [selectedMateria, setSelectedMateria] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [markingId, setMarkingId] = useState<string | null>(null); // stato per disabilitare il bottone mentre fa la chiamata
 
   // Carica i dati al mount del componente
   useEffect(() => {
@@ -48,6 +49,20 @@ const CompitiStudente: React.FC = () => {
       console.error('Errore nel caricamento dei dati:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Funzione per segnare compito come completato
+  const handleMarkAsCompleted = async (uuid: string) => {
+    setMarkingId(uuid);
+    try {
+      await compitiApi.markAsCompleted(uuid);
+      await loadData(); // ricarica dati dopo completamento
+    } catch (error) {
+      console.error('Errore nel segnare compito come completato:', error);
+      alert('Errore durante il completamento del compito. Riprova.');
+    } finally {
+      setMarkingId(null);
     }
   };
 
@@ -272,6 +287,13 @@ const CompitiStudente: React.FC = () => {
                             : 'IN TEMPO'
                           }
                         </span>
+                         <button
+                          disabled={markingId === compito.uuid}
+                          onClick={() => handleMarkAsCompleted(compito.uuid)}
+                          className="mt-2 px-3 py-1 rounded bg-green-600 text-white text-sm font-medium hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        >
+                          {markingId === compito.uuid ? 'Caricamento...' : 'Fatto'}
+                        </button>
                       </div>
                     </div>
                   </div>
