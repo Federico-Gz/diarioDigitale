@@ -27,4 +27,11 @@ Diario Digitale è un'applicazione web pensata per facilitare la comunicazione e
 
 Ogni utente ha una dashboard personalizzata in base al tipo di accesso (studente o docente).
 
+## Ruoli e Collaborazione
+
+Il progetto è stato sviluppato da Federico Graziani, Luca Aprile e Pierluigi Vitale.  
+Per il backend, abbiamo suddiviso il lavoro affrontando diverse parti del codice e collaborando per integrare e correggere insieme eventuali errori.  
+Per il frontend, abbiamo lavorato insieme in modo collaborativo, sviluppando tutte le funzionalità passo dopo passo.
+
 ---
+
